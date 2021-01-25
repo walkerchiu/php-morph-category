@@ -9,9 +9,9 @@ class CreateWkMorphCategoryTable extends Migration
     public function up()
     {
         Schema::create(config('wk-core.table.morph-category.categories'), function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->nullableMorphs('host');
-            $table->unsignedBigInteger('ref_id')->nullable();
+            $table->uuid('id');
+            $table->nullableUuidMorphs('host');
+            $table->uuid('ref_id')->nullable();
             $table->string('type')->nullable();
             $table->string('attribute_set')->nullable();
             $table->string('serial')->nullable();
@@ -26,6 +26,7 @@ class CreateWkMorphCategoryTable extends Migration
             $table->timestampsTz();
             $table->softDeletes();
 
+            $table->primary('id');
             $table->index('type');
             $table->index('attribute_set');
             $table->index('serial');
@@ -36,9 +37,9 @@ class CreateWkMorphCategoryTable extends Migration
         });
         if (!config('wk-morph-category.onoff.core-lang_core')) {
             Schema::create(config('wk-core.table.morph-category.categories_lang'), function (Blueprint $table) {
-                $table->bigIncrements('id');
-                $table->morphs('morph');
-                $table->unsignedBigInteger('user_id')->nullable();
+                $table->uuid('id');
+                $table->uuidMorphs('morph');
+                $table->uuid('user_id')->nullable();
                 $table->string('code');
                 $table->string('key');
                 $table->text('value')->nullable();
@@ -51,11 +52,13 @@ class CreateWkMorphCategoryTable extends Migration
                     ->on(config('wk-core.table.user'))
                     ->onDelete('set null')
                     ->onUpdate('cascade');
+
+                $table->primary('id');
             });
         }
         Schema::create(config('wk-core.table.morph-category.categories_morphs'), function (Blueprint $table) {
-            $table->unsignedBigInteger('category_id')->nullable();
-            $table->morphs('morph');
+            $table->uuid('category_id')->nullable();
+            $table->uuidMorphs('morph');
 
             $table->foreign('category_id')->references('id')
                   ->on(config('wk-core.table.morph-category.categories'))

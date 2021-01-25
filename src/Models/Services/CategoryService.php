@@ -38,11 +38,11 @@ class CategoryService
 
     /**
      * @param String $host_type
-     * @param Int    $host_id
+     * @param String $host_id
      * @param String $code
      * @param String $code_default
      * @param String $type
-     * @param Int    $id
+     * @param String $id
      * @param Int    $degree
      * @return Array
      */

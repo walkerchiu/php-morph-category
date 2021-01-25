@@ -23,7 +23,7 @@ class CategoryRepository extends Repository
 
     /**
      * @param String  $host_type
-     * @param Int     $host_id
+     * @param String  $host_id
      * @param String  $code
      * @param Array   $data
      * @param Int     $page
@@ -121,7 +121,7 @@ class CategoryRepository extends Repository
 
     /**
      * @param String $host_type
-     * @param Int    $host_id
+     * @param String $host_id
      * @param String $code
      * @param String $code_default
      * @param String $type
@@ -177,7 +177,7 @@ class CategoryRepository extends Repository
 
     /**
      * @param String  $host_type
-     * @param Int     $host_id
+     * @param String  $host_id
      * @param String  $code
      * @param String  $code_default
      * @param String  $type

@@ -2,10 +2,10 @@
 
 namespace WalkerChiu\MorphCategory\Models\Entities;
 
-use WalkerChiu\Core\Models\Entities\Entity;
 use WalkerChiu\Core\Models\Entities\LangTrait;
+use WalkerChiu\Core\Models\Entities\UuidEntity;
 
-class Category extends Entity
+class Category extends UuidEntity
 {
     use LangTrait;
 
@@ -102,7 +102,7 @@ class Category extends Entity
     /**
      * Get all of the categories for the category.
      *
-     * @param String $type
+     * @param String  $type
      * @param Boolean $is_enabled
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */

@@ -11,7 +11,7 @@ class CategoryRepositoryWithImage extends CategoryRepository
 
     /**
      * @param String  $host_type
-     * @param Int     $host_id
+     * @param String  $host_id
      * @param String  $code
      * @param Array   $data
      * @param Int     $page
@@ -111,11 +111,11 @@ class CategoryRepositoryWithImage extends CategoryRepository
 
     /**
      * @param String  $host_type
-     * @param Int     $host_id
+     * @param String  $host_id
      * @param String  $code
      * @param String  $code_default
      * @param String  $type
-     * @param Int     $id
+     * @param String  $id
      * @param Int     $degree
      * @param String  $target
      * @param Boolean $target_is_enabled
