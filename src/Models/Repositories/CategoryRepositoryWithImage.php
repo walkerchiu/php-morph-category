@@ -1,0 +1,327 @@
+<?php
+
+namespace WalkerChiu\MorphCategory\Models\Repositories;
+
+use WalkerChiu\Core\Models\Services\PackagingFactory;
+use WalkerChiu\MorphCategory\Models\Repositories\CategoryRepository;
+use WalkerChiu\MorphImage\Models\Repositories\ImageRepositoryTrait;
+
+class CategoryRepositoryWithImage extends CategoryRepository
+{
+    use ImageRepositoryTrait;
+
+    /**
+     * @param String  $host_type
+     * @param String  $host_id
+     * @param String  $code
+     * @param Array   $data
+     * @param Bool    $is_enabled
+     * @param String  $target
+     * @param Bool    $target_is_enabled
+     * @param Array   $exceptData
+     * @param Bool    $auto_packing
+     * @return Array|Collection|Eloquent
+     */
+    public function list(?string $host_type, ?string $host_id, string $code, array $data, $is_enabled = null, $target = null, $target_is_enabled = null, $exceptData = [], $auto_packing = false)
+    {
+        if (
+            empty($host_type)
+            || empty($host_id)
+        ) {
+            $instance = $this->instance;
+        } else {
+            $instance = $this->baseQueryForRepository($host_type, $host_id, $target, $target_is_enabled);
+        }
+        if ($is_enabled === true)      $instance = $instance->ofEnabled();
+        elseif ($is_enabled === false) $instance = $instance->ofDisabled();
+
+        $data = array_map('trim', $data);
+        $repository = $instance->with(['langs' => function ($query) use ($code) {
+                                    $query->ofCurrent()
+                                          ->ofCode($code);
+                                }])
+                                ->whereHas('langs', function ($query) use ($code) {
+                                    return $query->ofCurrent()
+                                                 ->ofCode($code);
+                                })
+                                ->when(
+                                    config('wk-morph-category.onoff.morph-tag')
+                                    && !empty(config('wk-core.class.morph-tag.tag'))
+                                , function ($query) {
+                                    return $query->with(['tags', 'tags.langs']);
+                                })
+                                ->when($exceptData, function ($query, $exceptData) {
+                                    return $query->where( function ($query) use ($exceptData) {
+                                        return $query->whereNull('type')
+                                                     ->orWhereNotIn('type', $exceptData);
+                                    });
+                                })
+                                ->when($data, function ($query, $data) {
+                                    return $query->when(empty($data['id']), function ($query) use ($data) {
+                                                    return $query->whereNull('ref_id');
+                                                }, function ($query) use ($data) {
+                                                    return $query->where('ref_id', $data['id']);
+                                                })
+                                            ->unless(empty($data['type']), function ($query) use ($data) {
+                                                return $query->where('type', $data['type']);
+                                            })
+                                            ->unless(empty($data['attribute_set']), function ($query) use ($data) {
+                                                return $query->where('attribute_set', $data['attribute_set']);
+                                            })
+                                            ->unless(empty($data['serial']), function ($query) use ($data) {
+                                                return $query->where('serial', $data['serial']);
+                                            })
+                                            ->unless(empty($data['identifier']), function ($query) use ($data) {
+                                                return $query->where('identifier', $data['identifier']);
+                                            })
+                                            ->unless(empty($data['order']), function ($query) use ($data) {
+                                                return $query->where('order', $data['order']);
+                                            })
+                                            ->unless(empty($data['name']), function ($query) use ($data) {
+                                                return $query->whereHas('langs', function ($query) use ($data) {
+                                                    $query->ofCurrent()
+                                                        ->where('key', 'name')
+                                                        ->where('value', 'LIKE', "%".$data['name']."%");
+                                                });
+                                            })
+                                            ->unless(empty($data['description']), function ($query) use ($data) {
+                                                return $query->whereHas('langs', function ($query) use ($data) {
+                                                    $query->ofCurrent()
+                                                        ->where('key', 'description')
+                                                        ->where('value', 'LIKE', "%".$data['description']."%");
+                                                });
+                                            });
+                                })
+                                ->orderBy('order', 'ASC');
+
+        if ($auto_packing) {
+            $factory = new PackagingFactory(config('wk-morph-category.output_format'), config('wk-morph-category.pagination.pageName'), config('wk-morph-category.pagination.perPage'));
+            $factory->setFieldsLang(['name', 'description']);
+
+            if (in_array(config('wk-morph-category.output_format'), ['array', 'array_pagination'])) {
+                switch (config('wk-morph-category.output_format')) {
+                    case "array":
+                        $entities = $factory->toCollection($repository);
+                        // no break
+                    case "array_pagination":
+                        $entities = $factory->toCollectionWithPagination($repository);
+                        // no break
+                    default:
+                        $output = [];
+                        foreach ($entities as $instance) {
+                            $data = $instance->toArray();
+                            array_push($output,
+                                array_merge($data, [
+                                    'covers'         => $this->getlistOfCovers($code),
+                                    'icons'          => $this->getlistOfIcons($code),
+                                    'child_disabled' => $instance->categories(null, 0)->count(),
+                                    'child_enabled'  => $instance->categories(null, 1)->count()
+                                ])
+                            );
+                        }
+                }
+                return $output;
+            } else {
+                return $factory->output($repository);
+            }
+        }
+
+        return $repository;
+    }
+
+    /**
+     * @param String  $host_type
+     * @param String  $host_id
+     * @param String  $code
+     * @param String  $code_default
+     * @param String  $type
+     * @param String  $id
+     * @param Int     $degree
+     * @param String  $target
+     * @param Bool    $target_is_enabled
+     * @return Array
+     *
+     * @throws NotUnsignedIntegerException
+     */
+    public function listMenu(?string $host_type, ?string $host_id, string $code, string $code_default, $type = null, $id = null, $degree = 0, $target = null, $target_is_enabled = null): array
+    {
+        if (
+            !is_integer($degree)
+            || $degree < 0
+        ) {
+            throw new NotUnsignedIntegerException($degree);
+        }
+
+        if (
+            empty($host_type)
+            || empty($host_id)
+        ) {
+            $instance = $this->instance;
+        } else {
+            $instance = $this->baseQueryForRepository($host_type, $host_id, $target, $target_is_enabled);
+        }
+        $records = $instance->with(['langs' => function ($query) {
+                                    $query->ofCurrent();
+                                }])
+                            ->ofEnabled()
+                            ->when(is_null($type), function ($query) {
+                                    return $query->whereNull('type');
+                                }, function ($query) use ($type) {
+                                    return $query->where('type', $type);
+                                })
+                            ->when(empty($id), function ($query) {
+                                    return $query->whereNull('ref_id');
+                                }, function ($query) use ($id) {
+                                    return $query->where('ref_id', $id);
+                                })
+                            ->orderBy('order', 'ASC')
+                            ->select('id', 'attribute_set', 'serial', 'identifier', 'url', 'target', 'icon', 'order')
+                            ->get();
+        $list = [];
+        foreach ($records as $record) {
+            $name        = $record->findLang($code, 'name');
+            $description = $record->findLang($code, 'description');
+            if (empty($name)) {
+                $name        = $record->findLang($code_default, 'name');
+                $description = $record->findLang($code_default, 'description');
+                if (empty($name))
+                    continue;
+            }
+            $data = [
+                'id'            => $record->id,
+                'attribute_set' => $record->attribute_set,
+                'serial'        => $record->serial,
+                'identifier'    => $record->identifier,
+                'url'           => $record->url,
+                'target'        => $record->target,
+                'icon'          => $record->icon,
+                'order'         => $record->order,
+                'images'        => $record->images,
+                'name'          => $name,
+                'description'   => $description,
+                'covers'        => $this->getlistOfCovers($code),
+                'icons'         => $this->getlistOfIcons($code)
+            ];
+            if ($degree > 0)
+                $data['child'] = $this->listMenu($host_type, $host_id, $code, $code_default, $type, $record->id, $degree-1, $target, $target_is_enabled);
+
+            array_push($list, $data);
+        }
+
+        return $list;
+    }
+
+    /**
+     * @param String  $id
+     * @param String  $code
+     * @param String  $code_default
+     * @param Array   $data
+     * @return Array
+     */
+    public function listBreadcrumb(string $id, string $code, $code_default = null, $data = []): array
+    {
+        $instance = $this->find($id);
+
+        if (is_null($code_default))
+            $code_default = config('wk-core.language');
+
+        if ($instance->reference) {
+            $data = $this->listBreadcrumb($instance->reference->id, $code, $code_default, $data);
+        }
+
+        $name        = $instance->findLang($code, 'name');
+        $description = $instance->findLang($code, 'description');
+        if (empty($name)) {
+            $name        = $instance->findLang($code_default, 'name');
+            $description = $instance->findLang($code_default, 'description');
+        }
+
+        array_push($data, [
+            'id'            => $instance->id,
+            'attribute_set' => $instance->attribute_set,
+            'identifier'    => $instance->identifier,
+            'url'           => $instance->url,
+            'cover'         => $instance->cover,
+            'icon'          => $instance->icon,
+            'images'        => $instance->images,
+            'name'          => $name,
+            'description'   => $description,
+            'icons'         => $this->getlistOfIcons($code)
+        ]);
+
+        return $data;
+    }
+
+    /**
+     * @param Category      $instance
+     * @param String|Array  $code
+     * @param String        $code_default
+     * @return Array
+     */
+    public function show($instance, $code, $code_default = null): array
+    {
+        $data = [
+            'id' => $instance ? $instance->id : '',
+            'basic' => [],
+            'icons' => []
+        ];
+
+        if (empty($instance))
+            return $data;
+
+        $this->setEntity($instance);
+
+        if (is_string($code)) {
+            $data['basic'] = [
+                  'host_type'     => $instance->host_type,
+                  'host_id'       => $instance->host_id,
+                  'type'          => $instance->type,
+                  'attribute_set' => $instance->attribute_set,
+                  'ref_id'        => $instance->ref_id,
+                  'ref_name'      => $instance->ref_id ? $instance->reference->findLang($code, 'name') : '',
+                  'serial'        => $instance->serial,
+                  'identifier'    => $instance->identifier,
+                  'url'           => $instance->url,
+                  'order'         => $instance->order,
+                  'images'        => $instance->images,
+                  'name'          => $instance->findLang($code, 'name'),
+                  'description'   => $instance->findLang($code, 'description'),
+                  'target'        => $instance->target,
+                  'cover'         => $instance->cover,
+                  'icon'          => $instance->icon,
+                  'is_enabled'    => $instance->is_enabled,
+                  'updated_at'    => $instance->updated_at,
+                  'breadcrumb'    => $this->listBreadcrumb($instance->id, $code, $code_default)
+            ];
+
+        } elseif (is_array($code)) {
+            foreach ($code as $language) {
+                $data['basic'][$language] = [
+                      'host_type'     => $instance->host_type,
+                      'host_id'       => $instance->host_id,
+                      'type'          => $instance->type,
+                      'attribute_set' => $instance->attribute_set,
+                      'ref_id'        => $instance->ref_id,
+                      'ref_name'      => $instance->ref_id ? $instance->reference->findLang($language, 'name') : '',
+                      'serial'        => $instance->serial,
+                      'identifier'    => $instance->identifier,
+                      'url'           => $instance->url,
+                      'order'         => $instance->order,
+                      'images'        => $instance->images,
+                      'name'          => $instance->findLang($language, 'name'),
+                      'description'   => $instance->findLang($language, 'description'),
+                      'target'        => $instance->target,
+                      'cover'         => $instance->cover,
+                      'icon'          => $instance->icon,
+                      'is_enabled'    => $instance->is_enabled,
+                      'updated_at'    => $instance->updated_at,
+                      'breadcrumb'    => $this->listBreadcrumb($instance->id, $language, $code_default)
+                ];
+            }
+        }
+        $data['covers'] = $this->getlistOfCovers($code);
+        $data['icons']  = $this->getlistOfIcons($code);
+
+        return $data;
+    }
+}
