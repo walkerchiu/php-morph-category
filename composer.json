@@ -1,0 +1,43 @@
+{
+    "name": "walkerchiu/php-morph-category",
+    "type": "library",
+    "authors": [
+        {
+            "name":  "Walker Chiu",
+            "email": "chenjen.chiou@gmail.com"
+        }
+    ],
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "^7.3",
+        "walkerchiu/php-core": "^1.0"
+    },
+    "suggest": {
+        "walkerchiu/php-morph-image": "^1.0",
+        "walkerchiu/php-morph-link": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "WalkerChiu\\MorphCategory\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "WalkerChiu\\MorphCategory\\MorphCategoryServiceProvider"
+            ],
+            "aliases": {
+                "Category":                 "WalkerChiu\\MorphCategory\\Models\\Entities\\Category",
+                "CategoryWithImage":        "WalkerChiu\\MorphCategory\\Models\\Entities\\CategoryWithImage",
+                "CategoryWithImageAndLink": "WalkerChiu\\MorphCategory\\Models\\Entities\\CategoryWithImageAndLink"
+            }
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    }
+}
