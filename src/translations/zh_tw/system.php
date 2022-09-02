@@ -55,22 +55,17 @@ return [
     ],
 
     'morphType' => [
-        'admin'      => 'Admin',
         'api'        => 'API',
         'article'    => '文章',
         'blog'       => '部落格',
         'catalog'    => '規格',
         'category'   => '分類',
         'card'       => '卡片',
-        'cover'      => '封面',
         'device'     => '裝置',
         'friendship' => '友誼',
         'group'      => '群組',
         'icon'       => '圖示',
         'image'      => '圖像',
-        'level'      => '等級',
-        'logo'       => '形象',
-        'newsletter' => '信件',
         'product'    => '品項',
         'record'     => '紀錄',
         'setting'    => '設定',
@@ -78,7 +73,6 @@ return [
         'stock'      => '庫存',
         'store'      => '商店',
         'site'       => '站臺',
-        'target'     => '目標',
         'variable'   => '變數'
     ]
 ];

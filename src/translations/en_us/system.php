@@ -55,22 +55,17 @@ return [
     ],
 
     'morphType' => [
-        'admin'      => 'Admin',
         'api'        => 'API',
         'article'    => 'Article',
         'blog'       => 'Blog',
         'catalog'    => 'Catalog',
         'category'   => 'Category',
         'card'       => 'Card',
-        'cover'      => 'Cover',
         'device'     => 'Device',
         'friendship' => 'Friendship',
         'group'      => 'Group',
         'icon'       => 'Icon',
         'image'      => 'Image',
-        'level'      => 'Level',
-        'logo'       => 'Logo',
-        'newsletter' => 'Newsletter',
         'product'    => 'Product',
         'record'     => 'Record',
         'setting'    => 'Setting',
@@ -78,7 +73,6 @@ return [
         'stock'      => 'Stock',
         'store'      => 'Store',
         'site'       => 'Site',
-        'target'     => 'Target',
         'variable'   => 'Variable'
     ]
 ];
