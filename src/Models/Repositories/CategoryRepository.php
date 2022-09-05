@@ -251,7 +251,7 @@ class CategoryRepository extends Repository
                                     return $query->where('ref_id', $id);
                                 })
                             ->orderBy('order', 'ASC')
-                            ->select('id', 'attribute_set', 'serial', 'identifier', 'url', 'target', 'icon', 'order')
+                            ->select('id', 'attribute_set', 'serial', 'identifier', 'url', 'target', 'order')
                             ->get();
         $list = [];
         foreach ($records as $record) {
@@ -270,7 +270,6 @@ class CategoryRepository extends Repository
                 'identifier'    => $record->identifier,
                 'url'           => $record->url,
                 'target'        => $record->target,
-                'icon'          => $record->icon,
                 'order'         => $record->order,
                 'images'        => $record->images,
                 'name'          => $name,
@@ -316,7 +315,6 @@ class CategoryRepository extends Repository
             'identifier'    => $instance->identifier,
             'url'           => $instance->url,
             'cover'         => $instance->cover,
-            'icon'          => $instance->icon,
             'images'        => $instance->images,
             'name'          => $name,
             'description'   => $description
@@ -360,7 +358,6 @@ class CategoryRepository extends Repository
                   'description'   => $instance->findLang($code, 'description'),
                   'target'        => $instance->target,
                   'cover'         => $instance->cover,
-                  'icon'          => $instance->icon,
                   'is_enabled'    => $instance->is_enabled,
                   'updated_at'    => $instance->updated_at,
                   'breadcrumb'    => $this->listBreadcrumb($instance->id, $code, $code_default)
@@ -384,7 +381,6 @@ class CategoryRepository extends Repository
                       'description'   => $instance->findLang($language, 'description'),
                       'target'        => $instance->target,
                       'cover'         => $instance->cover,
-                      'icon'          => $instance->icon,
                       'is_enabled'    => $instance->is_enabled,
                       'updated_at'    => $instance->updated_at,
                       'breadcrumb'    => $this->listBreadcrumb($instance->id, $language, $code_default)
