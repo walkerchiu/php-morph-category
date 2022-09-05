@@ -113,7 +113,6 @@ class CategoryRepositoryWithImage extends CategoryRepository
                             array_push($output,
                                 array_merge($data, [
                                     'covers'         => $this->getlistOfCovers($code),
-                                    'icons'          => $this->getlistOfIcons($code),
                                     'child_disabled' => $instance->categories(null, 0)->count(),
                                     'child_enabled'  => $instance->categories(null, 1)->count()
                                 ])
@@ -175,7 +174,7 @@ class CategoryRepositoryWithImage extends CategoryRepository
                                     return $query->where('ref_id', $id);
                                 })
                             ->orderBy('order', 'ASC')
-                            ->select('id', 'attribute_set', 'serial', 'identifier', 'url', 'target', 'icon', 'order')
+                            ->select('id', 'attribute_set', 'serial', 'identifier', 'url', 'target', 'order')
                             ->get();
         $list = [];
         foreach ($records as $record) {
@@ -194,13 +193,11 @@ class CategoryRepositoryWithImage extends CategoryRepository
                 'identifier'    => $record->identifier,
                 'url'           => $record->url,
                 'target'        => $record->target,
-                'icon'          => $record->icon,
                 'order'         => $record->order,
                 'images'        => $record->images,
                 'name'          => $name,
                 'description'   => $description,
                 'covers'        => $this->getlistOfCovers($code),
-                'icons'         => $this->getlistOfIcons($code)
             ];
             if ($degree > 0)
                 $data['child'] = $this->listMenu($host_type, $host_id, $code, $code_default, $type, $record->id, $degree-1, $target, $target_is_enabled);
@@ -242,11 +239,9 @@ class CategoryRepositoryWithImage extends CategoryRepository
             'identifier'    => $instance->identifier,
             'url'           => $instance->url,
             'cover'         => $instance->cover,
-            'icon'          => $instance->icon,
             'images'        => $instance->images,
             'name'          => $name,
             'description'   => $description,
-            'icons'         => $this->getlistOfIcons($code)
         ]);
 
         return $data;
@@ -263,7 +258,6 @@ class CategoryRepositoryWithImage extends CategoryRepository
         $data = [
             'id' => $instance ? $instance->id : '',
             'basic' => [],
-            'icons' => []
         ];
 
         if (empty($instance))
@@ -288,7 +282,6 @@ class CategoryRepositoryWithImage extends CategoryRepository
                   'description'   => $instance->findLang($code, 'description'),
                   'target'        => $instance->target,
                   'cover'         => $instance->cover,
-                  'icon'          => $instance->icon,
                   'is_enabled'    => $instance->is_enabled,
                   'updated_at'    => $instance->updated_at,
                   'breadcrumb'    => $this->listBreadcrumb($instance->id, $code, $code_default)
@@ -312,7 +305,6 @@ class CategoryRepositoryWithImage extends CategoryRepository
                       'description'   => $instance->findLang($language, 'description'),
                       'target'        => $instance->target,
                       'cover'         => $instance->cover,
-                      'icon'          => $instance->icon,
                       'is_enabled'    => $instance->is_enabled,
                       'updated_at'    => $instance->updated_at,
                       'breadcrumb'    => $this->listBreadcrumb($instance->id, $language, $code_default)
@@ -320,7 +312,6 @@ class CategoryRepositoryWithImage extends CategoryRepository
             }
         }
         $data['covers'] = $this->getlistOfCovers($code);
-        $data['icons']  = $this->getlistOfIcons($code);
 
         return $data;
     }

@@ -22,8 +22,6 @@ return [
         'target_blank' => 'New Window',
     'cover'         => 'Cover',
         'cover_placeholder' => 'Cover URL',
-    'icon'          => 'Icon',
-        'icon_placeholder' => 'Class',
     'order'         => 'Order',
     'images'        => 'Images',
     'is_enabled'    => 'Is Enabled',
