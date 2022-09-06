@@ -20,8 +20,6 @@ return [
     'target'        => '開啟方式',
         'target_self'  => '原分頁',
         'target_blank' => '新分頁',
-    'cover'         => '封面',
-        'cover_placeholder' => '封面 URL',
     'order'         => '排序',
     'images'        => '圖片',
     'is_enabled'    => '是否啟用',

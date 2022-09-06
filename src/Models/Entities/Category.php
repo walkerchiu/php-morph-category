@@ -30,7 +30,6 @@ class Category extends UuidEntity
             'identifier',
             'url',
             'target',
-            'cover',
             'images',
             'order'
         ]);
