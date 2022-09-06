@@ -112,7 +112,6 @@ class CategoryRepositoryWithImage extends CategoryRepository
                             $data = $instance->toArray();
                             array_push($output,
                                 array_merge($data, [
-                                    'covers'         => $this->getlistOfCovers($code),
                                     'child_disabled' => $instance->categories(null, 0)->count(),
                                     'child_enabled'  => $instance->categories(null, 1)->count()
                                 ])
@@ -197,7 +196,6 @@ class CategoryRepositoryWithImage extends CategoryRepository
                 'images'        => $record->images,
                 'name'          => $name,
                 'description'   => $description,
-                'covers'        => $this->getlistOfCovers($code),
             ];
             if ($degree > 0)
                 $data['child'] = $this->listMenu($host_type, $host_id, $code, $code_default, $type, $record->id, $degree-1, $target, $target_is_enabled);
@@ -238,7 +236,6 @@ class CategoryRepositoryWithImage extends CategoryRepository
             'attribute_set' => $instance->attribute_set,
             'identifier'    => $instance->identifier,
             'url'           => $instance->url,
-            'cover'         => $instance->cover,
             'images'        => $instance->images,
             'name'          => $name,
             'description'   => $description,
@@ -281,7 +278,6 @@ class CategoryRepositoryWithImage extends CategoryRepository
                   'name'          => $instance->findLang($code, 'name'),
                   'description'   => $instance->findLang($code, 'description'),
                   'target'        => $instance->target,
-                  'cover'         => $instance->cover,
                   'is_enabled'    => $instance->is_enabled,
                   'updated_at'    => $instance->updated_at,
                   'breadcrumb'    => $this->listBreadcrumb($instance->id, $code, $code_default)
@@ -304,14 +300,12 @@ class CategoryRepositoryWithImage extends CategoryRepository
                       'name'          => $instance->findLang($language, 'name'),
                       'description'   => $instance->findLang($language, 'description'),
                       'target'        => $instance->target,
-                      'cover'         => $instance->cover,
                       'is_enabled'    => $instance->is_enabled,
                       'updated_at'    => $instance->updated_at,
                       'breadcrumb'    => $this->listBreadcrumb($instance->id, $language, $code_default)
                 ];
             }
         }
-        $data['covers'] = $this->getlistOfCovers($code);
 
         return $data;
     }

@@ -18,7 +18,6 @@ class CreateWkMorphCategoryTable extends Migration
             $table->string('identifier');
             $table->string('url')->nullable();
             $table->string('target')->default('_self');
-            $table->string('cover')->nullable();
             $table->unsignedBigInteger('order')->nullable();
             $table->json('images')->nullable();
             $table->boolean('is_enabled')->default(0);

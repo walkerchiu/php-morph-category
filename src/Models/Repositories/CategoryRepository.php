@@ -314,7 +314,6 @@ class CategoryRepository extends Repository
             'attribute_set' => $instance->attribute_set,
             'identifier'    => $instance->identifier,
             'url'           => $instance->url,
-            'cover'         => $instance->cover,
             'images'        => $instance->images,
             'name'          => $name,
             'description'   => $description
@@ -357,7 +356,6 @@ class CategoryRepository extends Repository
                   'name'          => $instance->findLang($code, 'name'),
                   'description'   => $instance->findLang($code, 'description'),
                   'target'        => $instance->target,
-                  'cover'         => $instance->cover,
                   'is_enabled'    => $instance->is_enabled,
                   'updated_at'    => $instance->updated_at,
                   'breadcrumb'    => $this->listBreadcrumb($instance->id, $code, $code_default)
@@ -380,7 +378,6 @@ class CategoryRepository extends Repository
                       'name'          => $instance->findLang($language, 'name'),
                       'description'   => $instance->findLang($language, 'description'),
                       'target'        => $instance->target,
-                      'cover'         => $instance->cover,
                       'is_enabled'    => $instance->is_enabled,
                       'updated_at'    => $instance->updated_at,
                       'breadcrumb'    => $this->listBreadcrumb($instance->id, $language, $code_default)

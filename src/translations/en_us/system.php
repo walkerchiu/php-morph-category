@@ -20,8 +20,6 @@ return [
     'target'        => 'Open Method',
         'target_self'  => 'Current Window',
         'target_blank' => 'New Window',
-    'cover'         => 'Cover',
-        'cover_placeholder' => 'Cover URL',
     'order'         => 'Order',
     'images'        => 'Images',
     'is_enabled'    => 'Is Enabled',
